@@ -83,6 +83,8 @@ html * {
   background-size: cover;
   color: white;
 
+  transition: all 0.25s; 
+
   display: flex;
   flex-flow: column;
   justify-content: flex-end;
@@ -101,6 +103,14 @@ html * {
 
 .doggo.fighter.hovered {
   filter: grayscale(1);
+}
+
+.invert-colors {
+  filter: invert();
+}
+
+.doggo.slight-rotation {
+  transform: rotateZ(10deg);
 }
 
 #applicant-preview {

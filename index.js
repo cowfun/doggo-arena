@@ -122,7 +122,9 @@ toxicTim.innerHTML
 
 // Assign a string to `.innerHTML` will replace the contents of that node.
 // Any HTML inside of the text will be propery rendered as HTML
+/*
 toxicTim.innerHTML = `<h1>Chuck Norris</h1>`;
+*/
 
 // To get all the HTML inside of a node including the node itself, use the `.outerHTML`
 // property
@@ -167,7 +169,9 @@ toxicTim.classList.remove('fighter');
 
 // ☝️☝️☝️
 // toxicTim will now acquire the CSS properties declared for that class
+/*
 toxicTim.classList.add('selected');
+*/
 
 // There generic methods to get, set and remove HTML attributes. These
 // allow you to also create custom attributes.
@@ -247,6 +251,231 @@ const tSalmonRoster = q('.team.salmon .roster');
 // the second argument is the node where the first argument will be inserted before
 // this must be inside the callee (i.e. tSalmonRoster)
 tSalmonRoster.insertBefore(drillBitDarel, tSalmonRoster.firstElementChild);
+
+
+// Listening to Events
+
+// The .addEventListener is method usable on any Node instance
+// It takes two arguments:
+// - A string named after an event that exists (e.g. 'click', 'submit', 'mouseenter', etc.)
+//   For a list of available event names, https://developer.mozilla.org/en-US/docs/Web/Events
+// - A callback that is executed when the event is triggered
+
+// When the node toxicTim is clicked, 'Toxic Tim was clicked!' is logged to the console
+toxicTim.addEventListener('click', () => {
+  console.log('Toxic Tim was clicked!');
+})
+
+// To Check if an Object is an Instance of Node
+
+// Use the `instanceof` operator
+
+document instanceof Node // returns true
+'Bob' instanceof Node // returns false
+
+document.querySelectorAll('div') instanceof Node // returns false
+document.querySelectorAll('div') instanceof NodeList // returns true
+document.querySelectorAll('div')[0] instanceof Node // returns true
+
+// Event object
+
+// The callback passed to .addEventListener is called with an event object
+// That object contains all sorts of information related to the triggering event
+// This includes:
+// - the `target` node that originaly triggered the event
+// - the `currentTarget` node which is the node that listening for the event
+// - whether or not a modifier was held (e.g. shift, ctrl, commmand, etc)
+// - the time at which the event was triggered
+// - for mouse events, the coordinates of the cursor at the time the event was triggered
+// - for keyboard events, the key that was pressed the code of the character
+// - the type of event
+// - and, many many more
+
+// To look at the event object feel free to write a simple listener like so:
+document.addEventListener('click', event => console.log(event));
+// replace document with any DOM Node and replace 'click' with any other event
+
+// this inside .addEventListener callback
+
+// the `this` inside the callback is assigned to `event.currentTarget`. If you
+// want to make of `this`, make sure to define your callback as a regular
+// function and not an arrow function
+
+/*
+// BAD!
+document.addEventListener('click', () =>  {console.log(this)}) // logs undefined or window
+// GOOD!
+document.addEventListener('click', function () {console.log(this)}) // logs the document node
+*/
+
+// Call Stack Review
+
+const { log } = console;
+
+function a () {
+  log('This is A');
+}
+
+function b () {
+  a();
+  log('This is B');
+}
+
+function c () {
+  b();
+  log('This is C');
+}
+
+function d () {
+  debugger
+  c();
+  log('This is D');
+}
+
+// Asynchrounous Example
+
+console.log('-------------------')
+let aVar = 1
+console.log('Before setTimeout:', aVar);
+setTimeout(function () {
+  aVar = 20;
+  console.log('Inside setTimeout:', aVar);
+}, 0);
+console.log('After setTimeout:', aVar);
+
+
+// MOUSE EVENTS
+
+qs('.doggo').forEach(node => {
+  node.addEventListener('dblclick', event => {
+    const { currentTarget } = event;
+    // NEW! 👆 Destructuring syntax
+    // equivalent to:
+    // const currentTarget = event.currentTarget;
+
+    // currentTarget.style.filter = 'invert()';
+
+    currentTarget.classList.toggle('invert-colors');
+  });
+
+  node.addEventListener('mousedown', function (event) {
+    // inside an .addEventListener callback, `this` and `event.currentTarget`
+    // are usually interchangeable unless the callback is defined with an
+    // arrow function
+    this.classList.add('slight-rotation');
+  })
+
+  node.addEventListener('mouseup', event => {
+    event.currentTarget.classList.remove('slight-rotation');
+  })
+});
+
+// EXERCISE: Crouching Mouse Hidden Doggo
+
+// 1. Go to the Doggo Arena Demo Page
+// 2. Moving the mouse inside a doggo should make it monochrome
+//    Hint: Use a class and CSS!
+
+for (let doggo of qs('.doggo')) {
+  doggo.addEventListener('mouseenter', event => {
+    const { currentTarget } = event;
+    // Modifying the style inline is inadvisable
+    // Trying using a CSS class instead that triggers some CSS properties
+    currentTarget.style.filter = 'grayscale()';
+  })
+
+  doggo.addEventListener('mouseleave', event => {
+    const { currentTarget } = event;
+    currentTarget.style.filter = '';
+  })
+}
+
+
+// 3. Moving the mouse outside a doggo should reset it its monochrome
+
+// DEMO: Type Loudly & Explode on submit
+
+const random = n => Math.floor(Math.random() * n);
+
+const playKey = () =>
+  new Audio(`sounds/vintage-keyboard-${random(5) + 1}.wav`).play();
+
+qs('#application-form input').forEach(node => {
+  node.addEventListener('input', event => {
+    const { currentTarget } = event;
+
+    playKey();
+    // To get the field value, we first have to get the field node
+    // through the currentTarget or this, then we can use its value property
+    // to get or set
+    // console.log(currentTarget.value);
+  })
+});
+
+// the submit event only works on `form` nodes
+q('#application-form').addEventListener('submit', event => {
+  // prevent the submit event from doing a web request as it would normally do
+  // with 👇
+  event.preventDefault();
+  const form = event.currentTarget;
+  // To get data from from input fields, you can select them individually:
+  const nameInputValue = form.querySelector('[name=name]').value
+  const pictureUrlInputValue = form.querySelector('#picture-url').value
+  // Or, you can use the FormData constructor with the form node:
+  const fData = new FormData(form);
+  // Each input fields' values are accessible with the .get method of the
+  // form data instace by their name attribute
+  const nameValue = fData.get('name');
+  const pictureUrlValue = fData.get('picture-url');
+  // The form data object:
+  // https://developer.mozilla.org/en-US/docs/Web/API/FormData/FormData
+
+  // form.querySelector('[name=name]')
+  console.log(event);
+});
+
+
+// EXERCISE: Applicant's Avatar
+
+// 1. Go to Demo App
+// 2. Replace the applicant preview image's src (on the left) with
+//    the image url entered in the field
+
+q('#application-form').addEventListener('submit', event => {
+  const { currentTarget } = event;
+  const pictureUrl = new FormData(currentTarget).get('picture-url');
+  q('.doggo.blank').style.backgroundImage = `url(${pictureUrl})`;
+});
+
+// DEMO: Keyboard Events
+
+document.addEventListener('keydown', event => {
+  // console.log(event);
+  const { ctrlKey, shiftKey, key } = event;
+  if (ctrlKey && shiftKey && key.toLowerCase() === 'n') {
+    window.location.href = 'http://www.nyan.cat';
+  }
+});
+
+// EXERCISE: Shorcuts of the Ninja
+
+// Send user to http://hackertyper.net when 'panic' is typed anywhere on the page
+
+let lastKeys = '';
+
+document.addEventListener('keydown', event => {
+  const { key } = event;
+
+  if (key.length > 1) return;
+
+  lastKeys = (lastKeys + key).slice(-5);
+  console.log(lastKeys);
+  if (lastKeys.toLowerCase() === 'panic') {
+    console.log('OK. Panicking!');
+    window.location.href = 'http://hackertyper.net';
+  }
+})
+
 
 
 
