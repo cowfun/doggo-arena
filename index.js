@@ -292,7 +292,7 @@ document.querySelectorAll('div')[0] instanceof Node // returns true
 // - and, many many more
 
 // To look at the event object feel free to write a simple listener like so:
-document.addEventListener('click', event => console.log(event));
+// document.addEventListener('click', event => console.log(event));
 // replace document with any DOM Node and replace 'click' with any other event
 
 // this inside .addEventListener callback
@@ -476,11 +476,37 @@ document.addEventListener('keydown', event => {
   }
 })
 
+// EVENT PROPAGATION
 
+// Events propagate beginning from the document node and trickle down its
+// descendants until it reaches the source of the event. This is called the capturing
+// phase.
 
+// Once an event reaches its source node, it will then bubble going from
+// parent to parent until it reaches the document node. This is called the bubbling
+// phase.
 
+// Normally, .addEventListener will only trigger its callback during the bubbling
+// phase (when events are traveling through its source node's ancestors). We
+// can give .addEventListener a third argument (a boolean) to make it trigger
+// during the capturing phase instead by setting it to `true`.
+qs('.doggo').forEach(doggo => {
+  doggo.addEventListener('click', e => {
+    console.log(`${e.currentTarget.id} was triggered during capturing phase!`)
+  }, true);
 
+  doggo.addEventListener('click', e => {
+    console.log(`${e.currentTarget.id} was triggered during bubbling phase!`)
+  });
+});
 
+q('.teams').addEventListener('click', e => {
+  console.log(`Bubbling Phase`);
+});
+
+q('.teams').addEventListener('click', e => {
+  console.log(`Capturing Phase`);
+}, true);
 
 
 
