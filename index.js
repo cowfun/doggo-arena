@@ -219,12 +219,187 @@ teamSalmonRoster.insertBefore(
   teamSalmonRoster.firstElementChild
 )
 
+// DOM MANIPULATION II
 
+// EVENTS
 
+// Creating our first event listener
 
+// The .addEventListener is a method usable on any DOM Node instance.
+// It takes at least two arguments:
+// - A string named after an event that exists (e.g. 'click', 'submit', 'input',
+//   'mouseenter', 'mouseleave', etc)
+//   For a full list of events, go to https://developer.mozilla.org/en-US/docs/Web/Events
+// - A callback that is called when the event is triggered. It receives an event
+//   when called.
 
+// When the node Toxic Tim is clicked, 'Toxic Tim was clicked!' will be logged
+// to the console.
+toxicTim.addEventListener('click', () => {
+  console.log('Toxic Tim was clicked!');
+})
 
+// To check if an Object is an instance of a Node (or, any other prototype)
+// use the `instanceof` operator.
 
+document instanceof Node // true
+'Bob' instanceof Node // false
+
+document.querySelectorAll('div') instanceof Node // false
+document.querySelectorAll('div') instanceof NodeList // true
+document.querySelectorAll('div')[0] instanceof Node // true
+
+// You can only `.addEventListener` on Nodes or the majority of the methods
+// we saw during DOM Manipulation I. `instanceof` is a great to test if
+// an object is a Node.
+
+// Event Object
+
+// The callback passed to .addEventListener is called with an event object
+// that contains all sorts of information about the state of the program
+// at the time the event was triggered. This includes:
+//
+// - the `target` node that originally triggered the event.
+// - the `currentTarget` node which is the node that has the `.addEventListener`
+// - the time at which the event was triggered
+// - for mouse events, the coordinates of the cursor at the time the event was triggered
+// - for keyboard events, the key that was pressed
+// - and, many many more...
+
+/*
+document.addEventListener('click', function (event) {
+  debugger;
+  console.log(event);
+})
+*/
+
+// the `this` inside the callback is assigned `event.currentTarget`. If you want
+// to make us of it, make sure to define your callback as a regular function.
+// Do not use an arrow function, because the `this` of an arrow function can
+// not be changed.
+
+/*
+// BAD!
+document
+  .addEventListener('click', () => { console.log(this); }) // logs `undefined`
+// GOOD!
+document
+  .addEventListener('click', function () { console.log(this); }) // logs the `body` node
+*/
+
+// MOUSE EVENTS
+
+document.querySelectorAll('.doggo').forEach(node => {
+  node.addEventListener('dblclick', event => {
+    const {currentTarget, target} = event;
+    // const currentTarget = event.currentTarget;
+    // const target = event.target;
+    console.log('target:', target);
+    console.log('currentTarget:', currentTarget);
+    // BAD!
+    /*
+    if (currentTarget.style.filter.indexOf('invert') !== -1) {
+      currentTarget.style.filter = '';
+    } else {
+      currentTarget.style.filter = 'invert()';
+    }
+    */
+
+    // GOOD!
+    currentTarget.classList.toggle('invert');
+  });
+
+  node.addEventListener('mousedown', event => {
+    const {currentTarget} = event;
+    // 👆 Destructuring Assignment is syntax sugar for 👇
+    // const currentTarget = event.currentTarget;
+
+    currentTarget.classList.add('slight-rotation');
+  })
+
+  node.addEventListener('mouseup', function () {
+    this.classList.remove('slight-rotation');
+  })
+});
+
+// EXERCISE: Crouching Mouse Hidden Doggo
+
+for (let doggo of document.querySelectorAll('.doggo')) {
+  doggo.addEventListener('mouseenter', event => {
+    const {currentTarget} = event;
+    currentTarget.classList.add('monochrome');
+  })
+
+  doggo.addEventListener('mouseleave', event => {
+    const {currentTarget} = event;
+    currentTarget.classList.remove('monochrome');
+  })
+}
+
+// DEMO: Type Loudly & Explode on submit
+
+const random = n => Math.ceil(Math.random() * n);
+const playKey = () => new Audio(`sounds/vintage-keyboard-${random(5)}.wav`);
+
+document.querySelectorAll('#application-form input').forEach(node => {
+  node.addEventListener('input', event => {
+    const {currentTarget} = event;
+    // console.log(currentTarget.value);
+    playKey().play();
+  })
+})
+
+document.querySelector('#application-form').addEventListener('submit', event => {
+  const {currentTarget} = event;
+  // prevent the submit from causing a web request as submitted forms
+  // normally do
+  event.preventDefault();
+  new Audio('sounds/dog-bark-1.wav').play();
+})
+
+// EXERCISE: Keyboard events
+
+document.addEventListener('keydown', event => {
+  const {ctrlKey, shiftKey, key} = event;
+
+  // console.log(ctrlKey, shiftKey, key)
+
+  if (ctrlKey && shiftKey && key.toLowerCase() === 'n') {
+    window.location.href = 'http://www.nyan.cat'
+  }
+})
+
+// EXERCISE: Shortcuts of the Ninja
+
+document.addEventListener('keydown', event => {
+  const {altKey, ctrlKey, shiftKey, key} = event;
+
+  // MacOS will use special character when Alt is held,
+  // this is why have to check the with keyCode instead of key
+  if (ctrlKey && altKey && event.keyCode === 68) {
+    document.body.style.display = 'none';
+
+    setTimeout(() => {
+      document.body.style.display = 'initial';
+    }, 2000)
+  }
+});
+
+// Send user to http://hackertyper.net when 'panic' is typed anywhere on the page
+
+let lastKeys = '';
+
+document.addEventListener('keydown', event => {
+  const {altKey, ctrlKey, shiftKey, key} = event;
+
+  if (key.length > 1) return;
+
+  lastKeys = (lastKeys + key).slice(-5);
+
+  if (lastKeys.toLowerCase() === 'panic') {
+    window.location.href = 'http://hackertyper.net';
+  }
+})
 
 
 

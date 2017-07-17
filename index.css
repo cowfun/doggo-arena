@@ -15,6 +15,18 @@ html * {
   width: 775px;
 }
 
+.invert {
+  filter: invert();
+}
+
+.slight-rotation {
+  transform: rotateZ(20deg);
+}
+
+.monochrome {
+  filter: grayscale();
+}
+
 .teams > * {
   flex-basis: 50%;
 }
