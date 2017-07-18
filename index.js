@@ -401,6 +401,78 @@ document.addEventListener('keydown', event => {
   }
 })
 
+/*
+EVENT PROPAGATION
+
+Events propagate beginning from the document node and trickle down its descendants
+until it reaches the source of the event, the target. This is called the CAPTURE
+phase.
+
+Once an event reaches its source node, it is in an in-between phase, AT TARGET.
+Then, the event will bublle up parent to parent recursively until it reaches
+the document node. This is the BUBBLE phase.
+
+`.addEventListener` can be made to trigger during the CAPTURE phase by passing
+it a third argument with the value `true`. This effectively reverse the order
+in which `.addEventListener` are triggered. By default, it always uses the
+BUBBLE phase. In other words, events trigger at the target first then its
+ancestors in order.
+
+*/
+
+document.querySelectorAll('.doggo, .roster, .team, .teams').forEach(node => {
+  node.addEventListener('click', event => {
+    const {currentTarget, eventPhase} = event;
+    // debugger;
+    // event.stopPropagation();
+    // We can use `event.stopPropagation()` to prevent an event from
+    // spreading further. This means that we can have event trigger
+    // `.addEventListener`s of our choice respecting the CAPUTRE or BUBBLE order.
+    console.log(
+      `${currentTarget.id} ${currentTarget.className} Phase #${eventPhase} was triggered!`
+    )
+  })
+  node.addEventListener('click', event => {
+    const {currentTarget, eventPhase} = event;
+    // debugger;
+    console.log(
+      `${currentTarget.id} ${currentTarget.className} Phase #${eventPhase} was triggered!`
+    )
+  }, true)
+})
+
+// Notes on using FormData
+//
+// Select the form
+let form = document.querySelector('#application-form')
+
+// Create a new FormData object
+let formData = new FormData(form)
+
+formData.get('name')
+// returns the field with the name attribute of 'name'
+
+formData.get('picture-url')
+// returns the field with the name attribute of 'picture-url'
+
+formData.get('team-name')
+// returns the field with the name attribute of 'team-name'
+
+
+// The following returns and iterator that we can loop over with a for..of loop
+formData.keys()
+formData.values()
+formData.entries()
+
+// Display the key/value pairs
+let data = formData.entries()
+
+for(var pair of data) {
+  console.log(pair);
+}
+
+
+
 
 
 
